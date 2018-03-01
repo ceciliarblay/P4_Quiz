@@ -160,11 +160,11 @@ exports.testCmd = (rl, id) => {
   	  			answer=answer1.trim().toLowerCase();
   	  			
   	  			if(answer === quiz.answer.toLowerCase()){
-  	  				log('Su respuesta es:')
+  	  				log('Su respuesta es correcta.')
   	  				biglog('Correcta', 'green');
   	  				rl.prompt();
   	  			} else {
-  	  				log('Su respuesta es:')
+  	  				log('Su respuesta es incorrecta.')
   	  				biglog('Incorrecta', 'red');
   	  				rl.prompt();
   	  			}
@@ -201,7 +201,7 @@ exports.playCmd = rl => {
     if (toBeResolved.length === 0){
       log('No quedan más preguntas. Has completado el Quiz.');
       log('Tu puntuación final ha sido de: ' +score+' aciertos.');
-     rl.prompt();
+      rl.prompt();
     
     } else {
     
@@ -219,7 +219,7 @@ exports.playCmd = rl => {
           playOne();
        } else{
          score = 0;
-          log('Has fallado.')
+          log('Respuesta incorrecta.')
           log('Tu puntuación final ha sido de: '+score+' aciertos.');
           rl.prompt();
        }
