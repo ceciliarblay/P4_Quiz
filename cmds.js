@@ -157,14 +157,14 @@ exports.testCmd = (rl, id) => {
 	
   	  		rl.question(colorize(`${quiz.question}?: `, 'red'), answer1 => {
   	  			
-  	  			answer=answer1.trim();
-
-  	  			if(answer === quiz.answer){
-  	  				log('Su respuesta es correcta.')
+  	  			answer=answer1.trim().toLowerCase();
+  	  			
+  	  			if(answer === quiz.answer.toLowerCase()){
+  	  				log('Su respuesta es:')
   	  				biglog('Correcta', 'green');
   	  				rl.prompt();
   	  			} else {
-  	  				log('Su respuesta es incorrecta.')
+  	  				log('Su respuesta es:')
   	  				biglog('Incorrecta', 'red');
   	  				rl.prompt();
   	  			}
@@ -184,9 +184,50 @@ exports.testCmd = (rl, id) => {
  *
  * @param rl Objeto readline usado para implementar el CLI.
  */
+ 
 exports.playCmd = rl => {
-  log('Jugar.', 'red'); 
-  rl.prompt();
+           // log('Jugar.', 'red'); 
+  
+  let score = 0;
+  
+  let toBeResolved = [];
+  for(let i = 0; i<model.count(); i++){
+     toBeResolved[i] = i;
+  } 
+ 
+  
+  const playOne = () =>{
+  
+    if (toBeResolved.length === 0){
+      log('No quedan más preguntas. Has completado el Quiz.');
+      log('Tu puntuación final ha sido de: ' +score+' aciertos.');
+     rl.prompt();
+    
+    } else {
+    
+      let num = Math.round(Math.random()*(toBeResolved.length-1));
+      let id = toBeResolved[num];
+      let quiz = model.getByIndex(id);
+      toBeResolved.splice(num, 1); //eliminar elemento del array
+    
+      rl.question(colorize(`${quiz.question}?: `, 'red'), answer1 => {
+        answer=answer1.trim().toLowerCase();
+      
+        if(answer === quiz.answer.toLowerCase()){
+          score ++;
+          log('Llevas '+score+' respuestas correctas.');
+          playOne();
+       } else{
+         score = 0;
+          log('Has fallado.')
+          log('Tu puntuación final ha sido de: '+score+' aciertos.');
+          rl.prompt();
+       }
+     });
+   }
+  }
+  playOne();
+
 };
 
 /**
