@@ -261,13 +261,24 @@ exports.testCmd = (rl, id) => {
 exports.playCmd = rl => {
 
   let score = 0;
+  let id = 0;
   
-  let toBeResolved = [];
-  for(let i = 0; i<models.quiz.count(); i++){
-     toBeResolved[i] = i;
-  } 
+ // let toBeResolved = [];
+ // for(let i = 0; i<models.quiz.count(); i++){
+ //    toBeResolved[i] = i;
+ // } 
+
+  models.quiz.findAll()
+  .then(quizzes =>{
+    toBeResolved = quizzes;
+  })
 
   const playOne = () =>{
+
+    models.quiz.findAll()
+      .then(quizzes => {
+
+
     if (toBeResolved.length === 0){
       log('No quedan más preguntas. Has completado el Quiz.');
       log('Tu puntuación final ha sido de: ' +score+' aciertos.');
@@ -275,20 +286,21 @@ exports.playCmd = rl => {
     
     } else {
       let num = Math.round(Math.random()*(toBeResolved.length-1));
-      let id = toBeResolved[num];
-      toBeResolved.splice(num, 1); //eliminar elemento del array
+      //let id = toBeResolved[num];
+      //toBeResolved.splice(num, 1); //eliminar elemento del array
       validateId(id)
-      .then(id => models.quiz.findById(id))
+      .then(id => toBeResolved[num])
       .then(quiz => {
         if (!quiz){
           throw new Error(`No existe un quiz asociado al id=${id}.`);
         }
-        process.stdout.isTTY && setTimeout(() => {rl.write(quiz.answer)}, 0);
+        //process.stdout.isTTY && setTimeout(() => {rl.write(quiz.answer)}, 0);
         makeQuestion(rl,  `${quiz.question}?: `)
         .then(a => {
         if(a.trim().toLowerCase() === quiz.answer.toLowerCase()){
           score ++;
           log('Llevas '+score+' respuestas correctas.');
+          toBeResolved.splice(num, 1);
           playOne();
         }else{
           log('Respuesta incorrecta.')
@@ -299,7 +311,8 @@ exports.playCmd = rl => {
         });
       });
     }
-  }
+  });
+}
  playOne();
 };
 
