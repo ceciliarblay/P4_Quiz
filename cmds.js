@@ -260,6 +260,47 @@ exports.testCmd = (rl, id) => {
  
 exports.playCmd = rl => {
 
+  let score = 0;
+  
+  let toBeResolved = [];
+  for(let i = 0; i<models.quiz.count(); i++){
+     toBeResolved[i] = i;
+  } 
+
+  const playOne = () =>{
+    if (toBeResolved.length === 0){
+      log('No quedan más preguntas. Has completado el Quiz.');
+      log('Tu puntuación final ha sido de: ' +score+' aciertos.');
+      rl.prompt();
+    
+    } else {
+      let num = Math.round(Math.random()*(toBeResolved.length-1));
+      let id = toBeResolved[num];
+      toBeResolved.splice(num, 1); //eliminar elemento del array
+      validateId(id)
+      .then(id => models.quiz.findById(id))
+      .then(quiz => {
+        if (!quiz){
+          throw new Error(`No existe un quiz asociado al id=${id}.`);
+        }
+        process.stdout.isTTY && setTimeout(() => {rl.write(quiz.answer)}, 0);
+        makeQuestion(rl,  `${quiz.question}?: `)
+        .then(a => {
+        if(a.trim().toLowerCase() === quiz.answer.toLowerCase()){
+          score ++;
+          log('Llevas '+score+' respuestas correctas.');
+          playOne();
+        }else{
+          log('Respuesta incorrecta.')
+          log('Tu puntuación final ha sido de: '+score+' aciertos.');
+          score = 0;
+          rl.prompt();
+        }
+        });
+      });
+    }
+  }
+ playOne();
 };
 
 /**
